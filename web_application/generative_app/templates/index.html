@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#173f35">
+    <meta name="description" content="A workspace for recording observations, evidence, possibilities, and the history of changing understanding.">
+    <title>Generativity — a living record</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    <!-- Cytoscape recognizes this ID and uses the external container rule instead of injecting an inline stylesheet. -->
+    <link id="__________cytoscape_stylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='vendor/cytoscape.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='graph.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div id="app"><main id="main" class="boot-screen"><div class="brand-mark" aria-hidden="true">g.</div><p>Opening your workspace…</p></main></div>
+    <div id="notifications" class="notifications" aria-live="polite" aria-atomic="true"></div>
+    <dialog id="editor-dialog" aria-labelledby="dialog-title"></dialog>
+    <noscript>This workspace requires JavaScript to create and revise records.</noscript>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+Flask>=3.1,<3.2
+waitress>=3.0,<4
+jsonschema>=4.23,<5
+rfc8785>=0.1.4,<0.2
+# Also install the repository-local package: pip install -e applicative_infrastructure/common/packages/gsp_record_protocol
+
+# Shared storage: pip install -e applicative_infrastructure/common/packages/gsp_git_store

@@ -1,0 +1,4 @@
+# Preserve the recorded source baseline; scripts remain portable.
+* -text
+*.sh text eol=lf
+*.png binary
