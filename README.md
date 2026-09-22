@@ -3,6 +3,8 @@
 **Class:** Application and development guide  
 **Status:** Experimental application; gsp-record-protocol/0.2 and gsp.general/0.2
 
+**Source repository:** [Generalized-Generativity-Relational-Social-Science-Application](https://github.com/huangwanhong-maker/Generalized-Generativity-Relational-Social-Science-Application)
+
 The generalized application is a local web workspace for recording situations, their relations, the grounds of accounts about them, and their subsequent revision. A visual graph lets users create and connect records, inspect their modules and return to a coherent historical view.
 
 It is one application within the Generativity Standards Program. The programme's operational recording roles and working specifications inform its model; neither saving a record nor passing its validation establishes factual truth or formal Standard conformance.
@@ -36,7 +38,14 @@ gr_generalized_application/             This application Git repository
 
 This repository is a submodule of [applicative_infrastructure](../README.md). It consumes the sibling [record-protocol package](../common/packages/gsp_record_protocol/README.md) and [Git-store package](../common/packages/gsp_git_store/README.md). Common tools and packages belong to the infrastructure repository; this application does not depend on academia.
 
-The supported setup expects the infrastructure checkout with its submodules initialized. Cloning this application alone obtains its source but not the common packages or setup tools. Programme [specifications](../../specifications/) and [design decisions](../../decisions/ADR-0008-record-graphs-transactions-and-modules.md) are available in the complete programme checkout.
+The supported setup expects the infrastructure checkout with its submodules initialized. With GitHub SSH access configured:
+
+~~~powershell
+git clone --recurse-submodules git@github.com:huangwanhong-maker/Generativity-Relational-Epistemic-Applicative-Infrastructure.git applicative_infrastructure
+cd applicative_infrastructure
+~~~
+
+To obtain only this application's source, use `git clone git@github.com:huangwanhong-maker/Generalized-Generativity-Relational-Social-Science-Application.git gr_generalized_application`. That clone does not include the common packages or setup tools. Programme [specifications](../../specifications/) and [design decisions](../../decisions/ADR-0008-record-graphs-transactions-and-modules.md) resolve in the complete [programme checkout](https://github.com/huangwanhong-maker/Generativity-Epistemic-Infrastructure). The [Git workflow guide](https://github.com/huangwanhong-maker/Generativity-Epistemic-Infrastructure/blob/main/docs/development/git_repository_layers.md) covers Windows SSH setup and repository remotes.
 
 Application source commits and user project commits are separate histories. A parent infrastructure commit pins the application revision; runtime project repositories retain the users' record revisions.
 
@@ -97,6 +106,8 @@ The application currently provides owner-private projects. Sharing, invitations,
 Academia remains a separate native GRRP application; a shared domain adapter is future work. Preserve the distinction between retained material and assessed evidence, the account owner's status choice and independent review, and application attribution and authenticated external identity.
 
 Commit application edits here, then update its pinned commit in infrastructure and the infrastructure pin in the programme. Changes to common packages belong in infrastructure. Link conceptual changes to programme requirements and ADRs rather than redefining GR theory in application code alone.
+
+Publish this application's commits before publishing an infrastructure commit that references them, then publish the programme's updated infrastructure reference. Inside a submodule, select a development branch before committing because initialization normally checks out the pinned commit with a detached HEAD.
 
 ## License and contributors
 
