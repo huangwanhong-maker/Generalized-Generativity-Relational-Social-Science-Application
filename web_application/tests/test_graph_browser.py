@@ -14,6 +14,9 @@ def graph_page(tmp_path):
     from playwright.sync_api import expect, sync_playwright
     from waitress import create_server
 
+    # Real Git publication and the pinned snapshot reload can exceed five seconds
+    # on Windows, especially while another isolated browser is exercising Git.
+    expect.set_options(timeout=20000)
     server = create_server(create_app({"DATA_DIR": tmp_path / "graph-browser", "TESTING": True}), host="127.0.0.1", port=0, threads=4)
     thread = threading.Thread(target=server.run, daemon=True)
     thread.start()

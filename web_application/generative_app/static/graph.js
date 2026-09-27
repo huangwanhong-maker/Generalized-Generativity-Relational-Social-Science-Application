@@ -12,6 +12,7 @@ window.GSPGraph = (() => {
     const projectId = state.project.id;
     const base = apiProject(projectId);
     let alive = true, requestSequence = 0, inspectorSequence = 0;
+    let spacetime = null;
     let cy = null, graph = { nodes: [], edges: [], warnings: [] }, history = [];
     let canvasWidth = 0, canvasHeight = 0;
     const resizeObserver = new ResizeObserver(entries => {
@@ -43,11 +44,12 @@ window.GSPGraph = (() => {
     }
     function renderShell() {
       cy?.destroy(); cy = null;
-      root.innerHTML = `<div id="snapshot-banner"></div><div class="graph-project-strip"><span class="chip privacy">${icon("lock")}Private project</span><span id="snapshot-label" class="small muted"></span><details class="export-menu"><summary>Export this project ${icon("download")}</summary><div><a id="graph-json-export">Records as JSON</a><a id="graph-package-export">Snapshot with files</a><a href="${esc(base)}/bundle">Complete Git history</a><p>Full history includes earlier text, reasons and detached files.</p></div></details></div><div class="graph-toolbar"><div class="workspace-tabs" role="tablist" aria-label="Project view"><button role="tab" data-graph-view="graph" aria-selected="${view === "graph"}">${icon("connection")}Graph</button><button role="tab" data-graph-view="list" aria-selected="${view === "list"}">${icon("record")}List</button></div><div class="graph-filter-controls"><label class="search-input">${icon("search")}<span class="sr-only">Search records</span><input type="search" id="record-search" placeholder="Find a record…" value="${esc(query)}"></label><label><span class="sr-only">Filter by record role</span><select id="record-filter"><option value="">All roles</option>${types.map(role => `<option ${role === roleFilter ? "selected" : ""}>${esc(role)}</option>`).join("")}</select></label></div><label class="snapshot-picker"><span class="sr-only">Project revision</span><select id="project-revision"><option value="">Current project</option></select></label></div><div class="graph-commandbar"><div class="row">${button(`${icon("connection")}Connect records`, "connect")}${button("Connection form", "relation-form")}</div><span id="graph-filter-summary" class="graph-filter-summary" role="status"></span></div><div id="connect-instructions"></div><div class="graph-layout"><section class="graph-stage" aria-label="Record graph workspace"><div id="graph-canvas" role="img" aria-label="Graph of records and declared relationships. Use List view or the record selector for keyboard access."></div><div id="record-list" class="graph-record-list" hidden></div><div class="graph-empty" id="graph-empty" hidden><span class="empty-symbol">${icon("leaf")}</span><h2>Give a thought a place to grow.</h2><p>Start with a record. Connections can develop around it.</p><button class="button" data-action="new-record">${icon("plus")}Create your first record</button></div><div class="graph-view-tools" aria-label="Graph view controls">${button("+", "zoom-in", true, 'aria-label="Zoom in"')}${button("−", "zoom-out", true, 'aria-label="Zoom out"')}${button("Fit", "fit")}${button("Arrange", "arrange")}</div><div class="graph-legend"><span><i class="legend-record"></i>Record</span><span><i class="legend-relation"></i>Relation record</span><span><i class="legend-reference"></i>Neutral reference</span></div></section><aside class="graph-inspector" id="graph-inspector" aria-label="Selected record"></aside></div><div class="graph-bottom"><p>Double-click empty canvas to add a record, or use New record. Positions and lines do not establish chronology or causation.</p><span class="mono" id="graph-head"></span></div><div id="graph-warnings"></div>`;
+      root.innerHTML = `<div id="snapshot-banner"></div><div class="graph-project-strip"><span class="chip privacy">${icon("lock")}Private project</span><span id="snapshot-label" class="small muted"></span><details class="export-menu"><summary>Export this project ${icon("download")}</summary><div><a id="graph-json-export">Records as JSON</a><a id="graph-package-export">Snapshot with files</a><a href="${esc(base)}/bundle">Complete Git history</a><p>Full history includes earlier text, reasons and detached files.</p></div></details></div><div class="graph-toolbar"><div class="workspace-tabs" role="tablist" aria-label="Project view"><button role="tab" data-graph-view="graph" aria-selected="${view === "graph"}">${icon("connection")}Graph</button><button role="tab" data-graph-view="list" aria-selected="${view === "list"}">${icon("record")}List</button><button role="tab" data-graph-view="spacetime" aria-selected="${view === "spacetime"}">${icon("clock")}Spacetime</button></div><div class="graph-filter-controls"><label class="search-input">${icon("search")}<span class="sr-only">Search records</span><input type="search" id="record-search" placeholder="Find a record…" value="${esc(query)}"></label><label><span class="sr-only">Filter by record role</span><select id="record-filter"><option value="">All roles</option>${types.map(role => `<option ${role === roleFilter ? "selected" : ""}>${esc(role)}</option>`).join("")}</select></label></div><label class="snapshot-picker"><span class="sr-only">Project revision</span><select id="project-revision"><option value="">Current project</option></select></label></div><div class="graph-commandbar"><div class="row">${button(`${icon("connection")}Connect records`, "connect")}${button("Connection form", "relation-form")}</div><span id="graph-filter-summary" class="graph-filter-summary" role="status"></span></div><div id="connect-instructions"></div><div class="graph-layout"><section class="graph-stage" aria-label="Record graph workspace"><div id="graph-canvas" role="img" aria-label="Graph of records and declared relationships. Use List view or the record selector for keyboard access."></div><div id="record-list" class="graph-record-list" hidden></div><div id="spacetime-panel" hidden aria-label="Event order and ontology trajectories"></div><div class="graph-empty" id="graph-empty" hidden><span class="empty-symbol">${icon("leaf")}</span><h2>Give a thought a place to grow.</h2><p>Start with a record. Connections can develop around it.</p><button class="button" data-action="new-record">${icon("plus")}Create your first record</button></div><div class="graph-view-tools" aria-label="Graph view controls">${button("+", "zoom-in", true, 'aria-label="Zoom in"')}${button("−", "zoom-out", true, 'aria-label="Zoom out"')}${button("Fit", "fit")}${button("Arrange", "arrange")}</div><div class="graph-legend"><span><i class="legend-record"></i>Record</span><span><i class="legend-relation"></i>Relation record</span><span><i class="legend-reference"></i>Neutral reference</span></div></section><aside class="graph-inspector" id="graph-inspector" aria-label="Selected record"></aside></div><div class="graph-bottom"><p>Double-click empty canvas to add a record, or use New record. Positions and lines do not establish chronology or causation.</p><span class="mono" id="graph-head"></span></div><div id="graph-warnings"></div>`;
       root.querySelector("#record-search").addEventListener("input", event => { query = event.target.value; applyFilters(); });
       root.querySelector("#record-filter").addEventListener("change", event => { roleFilter = event.target.value; applyFilters(); });
       root.querySelector("#project-revision").addEventListener("change", event => void loadSnapshot(event.target.value || null));
       root.addEventListener("click", onClick);
+      spacetime = window.GSPSpaceTime.mount(root.querySelector("#spacetime-panel"), { api, base, esc, icon, errorText, selectRecord: selectNode, isReadOnly: readOnly });
     }
     function updateHeader() {
       root.querySelector("#snapshot-label").textContent = `${state.records.length} records · ${state.revision ? "preserved revision" : "current snapshot"}`;
@@ -78,6 +80,7 @@ window.GSPGraph = (() => {
         // Preserve that exact result as history instead of labelling it current.
         state.revision = (commit && !accepted) || state.currentHead !== chosenHead ? chosenHead : null;
         graph = projection; history = timeline.history || [];
+        spacetime.setSnapshot(chosenHead, state.records);
         selected = state.records.some(record => record.id === select) ? select : null;
         state.graphSelection = selected;
         connecting = false; picked = [];
@@ -135,6 +138,12 @@ window.GSPGraph = (() => {
       root.querySelectorAll("[data-graph-view]").forEach(item => item.setAttribute("aria-selected", String(item.dataset.graphView === next)));
       root.querySelector("#graph-canvas").hidden = next !== "graph";
       root.querySelector("#record-list").hidden = next !== "list";
+      root.querySelector("#spacetime-panel").hidden = next !== "spacetime";
+      root.querySelector(".graph-filter-controls").hidden = next === "spacetime";
+      root.querySelector(".graph-commandbar").hidden = next === "spacetime";
+      root.querySelector(".graph-bottom p").textContent = next === "spacetime" ? "Event boundaries select a partial view of represented topology. Unknown scope remains visible in the coverage list. Changing the boundary does not write a revision." : "Double-click empty canvas to add a record, or use New record. Positions and lines do not establish chronology or causation.";
+      if (next === "spacetime" && connecting) { connecting = false; picked = []; renderConnectBar(); }
+      spacetime?.show(next === "spacetime");
       root.querySelector(".graph-view-tools").hidden = next !== "graph";
       root.querySelector(".graph-legend").hidden = next !== "graph";
       root.querySelector("#graph-empty").hidden = state.records.length > 0 || next !== "graph";
@@ -165,22 +174,93 @@ window.GSPGraph = (() => {
         return;
       }
       const modules = record.modules || {};
-      const tabs = [["overview", "Overview"], ...(modules["gsp.relation"] ? [["relation", "Relation"]] : []), ...(modules["gsp.files"] ? [["files", "Files"]] : []), ...(modules["gsp.notes"] ? [["notes", "Notes"]] : []), ["history", "History"]];
+      const tabs = [["overview", "Overview"], ["temporal", "Time & trajectory"], ...(modules["gsp.relation"] ? [["relation", "Relation"]] : []), ...(modules["gsp.files"] ? [["files", "Files"]] : []), ...(modules["gsp.notes"] ? [["notes", "Notes"]] : []), ["history", "History"]];
       if (!tabs.some(([id]) => id === tab)) tab = "overview";
       panel.innerHTML = `<header class="inspector-header"><span class="eyebrow">${esc((record.record_roles || [record.record_type]).join(" · "))}</span><h2>${esc(record.title)}</h2><button class="button ghost icon-button inspector-close" data-graph-action="deselect" aria-label="Close selected record">${icon("close")}</button><div class="inspector-tabs" role="tablist" aria-label="Record modules">${tabs.map(([id, title]) => `<button role="tab" aria-selected="${tab === id}" data-inspector-tab="${id}">${title}</button>`).join("")}</div></header><div class="inspector-body" id="inspector-body"></div><footer class="inspector-footer"><span class="mono">${esc(record.id.slice(0, 13))}…</span><span>${state.revision ? "Preserved" : "Snapshot"} ${esc(state.head.slice(0, 7))}</span></footer>`;
       const body = panel.querySelector("#inspector-body");
       if (tab === "overview") {
-        const unsupported = Object.entries(modules).filter(([name, value]) => !["gsp.files", "gsp.notes", "gsp.relation"].includes(name) || !supported(value));
+        const unsupported = Object.entries(modules).filter(([name, value]) => !["gsp.files", "gsp.notes", "gsp.relation", "gsp.event_order", "gsp.temporal_extent"].includes(name) || !supported(value));
         body.innerHTML = `<div class="record-chips">${chips(record)}</div><p class="inspector-content">${esc(record.content)}</p><dl class="inspector-facts"><dt>Attributed source</dt><dd>${esc(record.attributed_to || "Not recorded")}</dd><dt>Method and grounds</dt><dd>${esc(record.method || "Not recorded")}</dd><dt>Evidence references</dt><dd>${esc(record.evidence || "Not recorded")}</dd><dt>Uncertainty</dt><dd>${esc(record.uncertainty || "Not recorded")}</dd><dt>Recorded by</dt><dd>${esc(displayAuthor(record.recorded_by))} · ${esc(date(record.created_at))}</dd></dl>${(record.record_roles || [record.record_type]).includes("Relation") && !modules["gsp.relation"] ? '<p class="notice">Unstructured relation account. No participant roles or predicate have been inferred from its text.</p>' : ""}<div class="inspector-actions">${!readOnly() ? button(`${icon("edit")}Revise record`, "edit-selected") + button("Create connected record", "create-connected") : ""}${button("Read full account", "full-record")}</div>${!readOnly() ? `<section class="module-options"><h3>Add to this record</h3><div class="row">${!modules["gsp.files"] ? button(`${icon("folder")}Files`, "enable-files") : ""}${!modules["gsp.notes"] ? button(`${icon("record")}Notes`, "enable-notes") : ""}${(record.record_roles || [record.record_type]).includes("Relation") && !modules["gsp.relation"] ? button("Structure relation", "structure-relation") : ""}</div><p>Modules retain material with this record and its revisions.</p></section>` : ""}${unsupported.map(([name, value]) => `<details class="unsupported-module"><summary>${esc(name)} · unsupported ${value.required ? "required" : "optional"} module</summary><p>This data is preserved and read-only in this application.</p><pre>${esc(JSON.stringify(value, null, 2))}</pre></details>`).join("")}`;
-      } else if (tab === "relation") renderRelation(body, record);
+      } else if (tab === "temporal") renderTemporal(body, record);
+      else if (tab === "relation") renderRelation(body, record);
       else if (tab === "files") renderFiles(body, record);
       else if (tab === "notes") renderNotes(body, record);
       else if (tab === "history") void renderRecordHistory(body, record, inspectorSequence);
     }
+    function temporalBoundary(boundary) {
+      if (boundary?.kind === "event") return state.records.find(item => item.id === boundary.event_id)?.title || boundary.event_id;
+      return boundary?.kind === "unbounded" ? "Unbounded within this account's scope" : "Unknown / not recorded";
+    }
+    function renderTemporal(body, record) {
+      const extent = moduleData(record, "gsp.temporal_extent"), order = moduleData(record, "gsp.event_order");
+      const isEvent = (record.record_roles || [record.record_type]).includes("Event");
+      const relatedOrders = state.records.filter(item => {
+        const data = moduleData(item, "gsp.event_order");
+        return data && (data.before === record.id || data.after === record.id);
+      });
+      const supportedExtent = !record.modules?.["gsp.temporal_extent"] || supported(record.modules["gsp.temporal_extent"]);
+      body.innerHTML = `<span class="eyebrow">Time &amp; trajectory</span><p class="field-help">Temporal boundaries describe the represented situation. They are independent of when this record was saved.</p><dl class="inspector-facts"><dt>Described time</dt><dd>${esc(record.occurred_at || "Not recorded")}</dd><dt>Start boundary · inclusive</dt><dd>${esc(temporalBoundary(extent?.start))}</dd><dt>End boundary · exclusive</dt><dd>${esc(temporalBoundary(extent?.end))}</dd><dt>Grounds for these boundaries</dt><dd>${esc(extent?.basis || "No temporal extent recorded")}</dd><dt>Trajectory subject</dt><dd>${extent?.subject_record_id ? `<button class="button-link" data-select-record="${esc(extent.subject_record_id)}">${esc(state.records.find(item => item.id === extent.subject_record_id)?.title || extent.subject_record_id)}</button>` : "This record; no additional subject grouping"}</dd></dl>${!supportedExtent ? '<p class="notice">This temporal module version is unsupported. Its retained data remains available in Overview.</p>' : !readOnly() ? button(extent ? "Revise temporal extent" : "Describe temporal extent", "edit-temporal") + (extent ? button("Remove temporal extent", "remove-temporal_extent") : "") : ""}${order ? `<section class="module-options"><h3>Precedence account</h3><p>${esc(temporalBoundary({ kind: "event", event_id: order.before }))} → ${esc(temporalBoundary({ kind: "event", event_id: order.after }))}</p><p>Claimed order: before. Assessment: ${esc(record.status)}. Occurrence: ${esc(record.modality)}. Revise the record's assessment to withdraw this constraint while preserving its history.</p>${!readOnly() ? button("Revise event order", "edit-order") : ""}</section>` : ""}${isEvent ? `<section class="module-options"><h3>Order around this event</h3><ul class="temporal-order-links">${relatedOrders.map(item => `<li><button class="button-link" data-select-record="${esc(item.id)}">${esc(item.title)}</button><br><span class="small muted">${esc(item.status)} · ${esc(item.modality)}</span></li>`).join("") || '<li>No precedence accounts recorded. This does not mean the event is simultaneous with another.</li>'}</ul>${!readOnly() ? button("Add event order", "temporal-order") : ""}</section>` : ""}<p class="field-help">Unknown boundaries are not treated as unbounded. A subject grouping is an attributed connection among descriptions, not an identity determination.</p>`;
+    }
+    function temporalDialog() {
+      const record = currentRecord(); if (!record) return;
+      const priorModule = moduleValue(record, "gsp.temporal_extent");
+      if (priorModule && !supported(priorModule)) return;
+      const prior = priorModule?.data || {};
+      const events = state.records.filter(item => (item.record_roles || [item.record_type]).includes("Event"));
+      function boundaryFields(name, label, boundary) {
+        return `<fieldset class="temporal-bound-editor"><legend>${label}</legend><div class="field"><label class="label" for="temporal-${name}-kind">Boundary description</label><select id="temporal-${name}-kind" name="${name}_kind">${[["unknown", "Unknown / not recorded"], ["event", "At a recorded event"], ["unbounded", "Unbounded within this account's scope"]].map(([value, text]) => `<option value="${value}" ${(boundary?.kind || "unknown") === value ? "selected" : ""}>${text}</option>`).join("")}</select></div><div class="field" data-temporal-event-field="${name}"><label class="label" for="temporal-${name}-event">Event boundary</label><select id="temporal-${name}-event" name="${name}_event"><option value="">Choose an event…</option>${events.map(item => `<option value="${esc(item.id)}" ${boundary?.event_id === item.id ? "selected" : ""}>${esc(item.title)}</option>`).join("")}</select></div></fieldset>`;
+      }
+      mutationDialog({ title: "Describe this record's temporal extent.", description: "Choose event boundaries for the represented situation, with grounds for the account.", category: "evidence_or_interpretation", body: `<p class="notice">${esc(record.title)}. A start event is included; an end event is excluded. Unknown boundaries keep presence indeterminate. Unbounded is an explicit claim within your stated scope.</p>${boundaryFields("start", "Start · inclusive", prior.start)}${boundaryFields("end", "End · exclusive", prior.end)}<div class="field"><label class="label optional-label" for="temporal-subject">Group this description under a subject</label><select id="temporal-subject" name="subject_record_id"><option value="">No additional grouping</option>${state.records.map(item => `<option value="${esc(item.id)}" ${prior.subject_record_id === item.id ? "selected" : ""}>${esc(item.title)}</option>`).join("")}</select><p class="field-help">For example, group successive State records under the Entity they describe. This does not resolve identity or competing accounts.</p></div>${inputField("temporal_basis", "Grounds and scope for these temporal boundaries", prior.basis, 2000, { required: true, multiline: true, rows: 3, placeholder: "How is this interval known, and within what scope?" })}`, onReady: form => {
+        for (const name of ["start", "end"]) {
+          const update = () => {
+            const isEvent = form.elements[`${name}_kind`].value === "event";
+            form.querySelector(`[data-temporal-event-field="${name}"]`).hidden = !isEvent;
+            form.elements[`${name}_event`].required = isEvent;
+          };
+          form.elements[`${name}_kind`].addEventListener("change", update); update();
+        }
+      }, prepare: form => {
+        const values = new FormData(form);
+        const boundary = name => values.get(`${name}_kind`) === "event" ? { kind: "event", event_id: String(values.get(`${name}_event`)) } : { kind: String(values.get(`${name}_kind`)) };
+        const data = { start: boundary("start"), end: boundary("end"), basis: String(values.get("temporal_basis") || "").trim() };
+        if (values.get("subject_record_id")) data.subject_record_id = String(values.get("subject_record_id"));
+        return [{ op: "module.set", record_id: record.id, module_id: "gsp.temporal_extent", module: { version: "1", required: true, data } }];
+      }, saved: "Temporal extent preserved with its grounds." });
+      tab = "temporal";
+    }
+    function orderDialog(record = null) {
+      if (readOnly()) return;
+      const events = state.records.filter(item => (item.record_roles || [item.record_type]).includes("Event"));
+      if (!events.length) { toast("Create an Event record before describing event order."); return; }
+      const relationId = record?.id || uuid(), prior = moduleData(record, "gsp.event_order") || {};
+      if (record?.modules?.["gsp.event_order"] && !supported(record.modules["gsp.event_order"])) return;
+      let priorRelation = moduleData(record, "gsp.relation") || {};
+      let incidenceIds = [priorRelation.participants?.find(item => item.orientation === "in")?.id || uuid(), priorRelation.participants?.find(item => item.orientation === "out")?.id || uuid()];
+      const selectedEvent = events.some(item => item.id === selected) ? selected : "";
+      const eventSelector = (name, label, chosen) => `<div class="field"><label class="label" for="order-${name}">${label}</label><select id="order-${name}" name="${name}" required><option value="">Choose an event…</option>${events.map(item => `<option value="${esc(item.id)}" ${item.id === chosen ? "selected" : ""}>${esc(item.title)}</option>`).join("")}</select></div>`;
+      mutationDialog({ title: record ? "Revise the event precedence account." : "Describe an order between events.", description: "An ordering account is a Relation record with its own grounds and revision history.", select: relationId, category: "evidence_or_interpretation", body: `<p class="notice">Declare strict precedence: the first event happened before the second in this account. Recording order, visual proximity and absence of an arrow do not establish temporal order. Conflicting claims remain inspectable and can prevent a consistent projection.</p><div class="field-grid">${eventSelector("before", "Earlier event", prior.before || selectedEvent)}${eventSelector("after", "Later event", prior.after)}</div>${inputField("order_title", "Ordering account title", record?.title, 160, { placeholder: "Optional; otherwise named after the events" })}${inputField("order_content", "Account and grounds for this ordering", record?.content, 20000, { required: true, multiline: true, rows: 3 })}${selectField("order_epistemic_mode", "Primary knowledge basis", modes, record?.epistemic_mode || "", "The claim remains attributed; an arrow is not independent proof.", "How is this order known?")}${selectField("order_modality", "Occurrence or possibility of this ordering", ["realized", "intended", "possible", "unrealized", "unknown"], record?.modality || "unknown", "Describe whether this is an account of an actual sequence or a possible, intended, unrealized or unknown one.")}`, prepare: form => {
+        const values = new FormData(form), before = String(values.get("before")), after = String(values.get("after"));
+        const name = id => events.find(item => item.id === id)?.title || id;
+        const title = String(values.get("order_title") || "").trim() || `${name(before)} precedes ${name(after)}`.slice(0, 160);
+        const core = { title, content: String(values.get("order_content") || "").trim(), epistemic_mode: String(values.get("order_epistemic_mode")), modality: String(values.get("order_modality")) };
+        const orderModule = { version: "1", required: true, data: { before, after } };
+        const relationModule = { version: "1", required: record?.modules?.["gsp.relation"]?.required || false, data: { ...priorRelation, predicate: priorRelation.predicate || "precedes", predicate_definition: priorRelation.predicate_definition ?? "The represented first event strictly precedes the represented second event in this attributed account.", participants: [{ id: incidenceIds[0], record_id: before, role: priorRelation.participants?.find(item => item.orientation === "in")?.role || "before", reference_scope: "represented_target", orientation: "in" }, { id: incidenceIds[1], record_id: after, role: priorRelation.participants?.find(item => item.orientation === "out")?.role || "after", reference_scope: "represented_target", orientation: "out" }], participants_complete: record ? priorRelation.participants_complete !== false : true, participant_limitations: priorRelation.participant_limitations || "", context: priorRelation.context || "", identity_criterion: priorRelation.identity_criterion || "An attributed claim of strict event precedence.", temporal_scope: priorRelation.temporal_scope || "" } };
+        if (record) return [{ op: "record.update", record_id: record.id, changes: core }, { op: "module.set", record_id: record.id, module_id: "gsp.relation", module: relationModule }, { op: "module.set", record_id: record.id, module_id: "gsp.event_order", module: orderModule }];
+        return [{ op: "record.create", record: { id: relationId, ...core, record_type: "Relation", record_roles: ["Relation"], status: "unreviewed", related_records: [], modules: { "gsp.relation": relationModule, "gsp.event_order": orderModule } } }];
+      }, onReviewed: latest => {
+        const reviewed = latest.records.find(item => item.id === relationId);
+        if (record && reviewed) {
+          record = reviewed;
+          priorRelation = moduleData(reviewed, "gsp.relation") || {};
+          incidenceIds = [priorRelation.participants?.find(item => item.orientation === "in")?.id || uuid(), priorRelation.participants?.find(item => item.orientation === "out")?.id || uuid()];
+        }
+      }, saved: "Event ordering account preserved." });
+      tab = "temporal";
+    }
     function renderRelation(body, record) {
       const relation = moduleData(record, "gsp.relation");
       if (!relation) { body.innerHTML = '<p class="notice">This relation module version is unsupported; its data is preserved.</p>'; return; }
-      body.innerHTML = `<span class="eyebrow">Declared relationship</span><h3>${esc(relation.predicate)}</h3><p class="small">${esc(relation.predicate_definition || "No predicate definition supplied.")}</p><div class="participant-list">${(relation.participants || []).map(participant => { const target = state.records.find(r => r.id === participant.record_id); return `<div class="participant-card"><span class="chip">${esc(participant.role)}</span><button class="button-link" data-select-record="${esc(participant.record_id)}">${esc(target?.title || "Referenced record unavailable")}</button><span>${participant.reference_scope === "record" ? "The record itself" : "Its represented target"} · ${esc(participant.orientation)}</span></div>`; }).join("")}</div><dl class="inspector-facts"><dt>Participant scope</dt><dd>${relation.participants_complete ? "Listed participants declared complete" : esc(relation.participant_limitations || "Incomplete")}</dd><dt>Context</dt><dd>${esc(relation.context || "Not recorded")}</dd><dt>Identity criterion</dt><dd>${esc(relation.identity_criterion || "Not recorded")}</dd><dt>Temporal scope</dt><dd>${esc(relation.temporal_scope || "Not recorded")}</dd></dl><p class="field-help">Orientation describes the incidence, without establishing causation or evidential strength.</p>${!readOnly() ? button("Revise relation", "edit-relation") + button("Remove structure", "remove-relation") : ""}`;
+      body.innerHTML = `<span class="eyebrow">Declared relationship</span><h3>${esc(relation.predicate)}</h3><p class="small">${esc(relation.predicate_definition || "No predicate definition supplied.")}</p><div class="participant-list">${(relation.participants || []).map(participant => { const target = state.records.find(r => r.id === participant.record_id); return `<div class="participant-card"><span class="chip">${esc(participant.role)}</span><button class="button-link" data-select-record="${esc(participant.record_id)}">${esc(target?.title || "Referenced record unavailable")}</button><span>${participant.reference_scope === "record" ? "The record itself" : "Its represented target"} · ${esc(participant.orientation)}</span></div>`; }).join("")}</div><dl class="inspector-facts"><dt>Participant scope</dt><dd>${relation.participants_complete ? "Listed participants declared complete" : esc(relation.participant_limitations || "Incomplete")}</dd><dt>Context</dt><dd>${esc(relation.context || "Not recorded")}</dd><dt>Identity criterion</dt><dd>${esc(relation.identity_criterion || "Not recorded")}</dd><dt>Temporal scope</dt><dd>${esc(relation.temporal_scope || "Not recorded")}</dd></dl><p class="field-help">Orientation describes the incidence, without establishing causation or evidential strength.</p>${!readOnly() ? record.modules?.["gsp.event_order"] ? button("Revise event order", "edit-order") : button("Revise relation", "edit-relation") + button("Remove structure", "remove-relation") : ""}`;
     }
     function renderFiles(body, record) {
       const files = moduleData(record, "gsp.files");
@@ -201,7 +281,7 @@ window.GSPGraph = (() => {
       } catch (error) { if (alive && sequence === inspectorSequence) body.innerHTML = `<p class="error-box">${esc(errorText(error))}</p>`; }
     }
     function formatSize(bytes) { return bytes < 1024 ? `${bytes} bytes` : bytes < 1024 ** 2 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 ** 2).toFixed(1)} MB`; }
-    function mutationDialog({ title, description, body, prepare, saved = "Project revision preserved.", select = selected, category = "description", onReady }) {
+    function mutationDialog({ title, description, body, prepare, saved = "Project revision preserved.", select = selected, category = "description", onReady, onReviewed }) {
       if (readOnly() && category !== "migration") return;
       let expectedHead = state.head, pending = null;
       openDialog(`${dialogHeader(title, description, "Preserve a revision")}<form id="module-form"><div class="dialog-body">${body}${category !== "migration" ? selectField("change_category", "What kind of change is this?", ["description", "represented_change", "evidence_or_interpretation", "classification", "maintenance"], category, "This records your account of the change. It does not independently establish that a situation changed.") : '<p class="field-help">Change category: format migration.</p>'}${inputField("reason", "Reason for this change", "", 2000, { required: true, multiline: true, rows: 2, placeholder: "What changed, and why should it be retained?" })}<div class="form-error" role="alert"></div><div class="transaction-conflict"></div></div><footer class="dialog-footer"><span class="small">Saved together in one project revision.</span><div class="row"><button class="button secondary" data-action="close-dialog" type="button">Cancel</button><button class="button" type="submit">Save revision${icon("arrow")}</button></div></footer></form>`);
@@ -225,8 +305,9 @@ window.GSPGraph = (() => {
             for (const [part, file] of Object.entries(pending.files)) requestBody.append(part, file, file.name);
           }
           const result = await api(`${base}/transactions`, { method: "POST", body: requestBody });
-          dialog.close(); toast(result.replayed ? "The earlier save was already preserved; recovered its receipt." : saved);
           await loadSnapshot(result.head, { accepted: true, select });
+          dialog.close(); toast(result.replayed ? "The earlier save was already preserved; recovered its receipt." : saved);
+          root.querySelector(".inspector-header h2")?.focus({ preventScroll: true });
         } catch (error) {
           form.querySelector(".form-error").innerHTML = `<p class="error-box">${esc(errorText(error))}</p>`;
           if (error.status === 409) {
@@ -239,7 +320,7 @@ window.GSPGraph = (() => {
                 const latest = await api(base);
                 const affected = latest.records.filter(record => pending?.envelope.operations.some(operation => operation.record_id === record.id || operation.record?.id === record.id));
                 preview.innerHTML = `<div class="conflict-preview"><p>${latest.records.length} records · ${esc(latest.head.slice(0, 10))}</p><pre>${esc(JSON.stringify(affected, null, 2))}</pre><p>Keeping your draft will apply the fields shown in this form to that reviewed version. It will not merge competing descriptions.</p><button type="button" class="button secondary small-button" id="module-use-latest">Use reviewed version and keep draft</button></div>`;
-                preview.querySelector("#module-use-latest").addEventListener("click", () => { expectedHead = latest.head; pending = null; conflict.innerHTML = '<p class="notice">The draft now uses the reviewed project revision. Review it and save again.</p>'; });
+                preview.querySelector("#module-use-latest").addEventListener("click", () => { onReviewed?.(latest); expectedHead = latest.head; pending = null; conflict.innerHTML = '<p class="notice">The draft now uses the reviewed project revision. Review it and save again.</p>'; });
               } catch (failure) { preview.innerHTML = `<p class="error-box">${esc(errorText(failure))}</p>`; event.currentTarget.disabled = false; }
             });
           } else if (!error.status) {
@@ -256,8 +337,9 @@ window.GSPGraph = (() => {
       tab = name;
     }
     function removeModule(name) {
+      const label = name.replaceAll("_", " ");
       const record = currentRecord(); if (!record) return;
-      mutationDialog({ title: `Remove ${name === "relation" ? "relation structure" : `${name} module`}.`, description: "Earlier versions remain in project history.", body: `<p class="notice">This removes the current ${esc(name)} module from “${esc(record.title)}”. It does not erase historical content or delete the record.</p>`, prepare: () => [{ op: "module.remove", record_id: record.id, module_id: `gsp.${name}` }], saved: "Module removed from the current record." });
+      mutationDialog({ title: `Remove ${name === "relation" ? "relation structure" : `${label} module`}.`, description: "Earlier versions remain in project history.", body: `<p class="notice">This removes the current ${esc(label)} module from “${esc(record.title)}”. It does not erase historical content or delete the record.</p>`, prepare: () => [{ op: "module.remove", record_id: record.id, module_id: `gsp.${name}` }], saved: "Module removed from the current record." });
     }
     function notesDialog() {
       const record = currentRecord(); if (!record) return;
@@ -336,6 +418,9 @@ window.GSPGraph = (() => {
       else if (action === "create-connected") editRecord(null, { connectTo: selected });
       else if (action === "full-record") { state.graphSelection = selected; context.openFullRecord?.(selected, state.revision || state.head); }
       else if (action === "edit-relation" || action === "structure-relation") relationDialog([], currentRecord());
+      else if (action === "temporal-order") orderDialog();
+      else if (action === "edit-order") orderDialog(currentRecord());
+      else if (action === "edit-temporal") temporalDialog();
       else if (action === "enable-files") enableModule("files");
       else if (action === "enable-notes") enableModule("notes");
       else if (action === "edit-notes") notesDialog();
@@ -353,7 +438,7 @@ window.GSPGraph = (() => {
     resizeObserver.observe(root.querySelector(".graph-stage"));
     void loadSnapshot(state.revision || state.head, { accepted: !state.revision });
     return {
-      destroy() { alive = false; ++requestSequence; ++inspectorSequence; resizeObserver.disconnect(); root.removeEventListener("click", onClick); cy?.destroy(); cy = null; },
+      destroy() { alive = false; ++requestSequence; ++inspectorSequence; resizeObserver.disconnect(); spacetime?.destroy(); root.removeEventListener("click", onClick); cy?.destroy(); cy = null; },
       refresh(head, selection = selected) { return loadSnapshot(head, { accepted: true, select: selection }); },
       selectedRecord: currentRecord,
       placeRecord(id, position) { const stored = positions(); stored[id] = position; try { localStorage.setItem(localKey, JSON.stringify(stored)); } catch (_) { /* The record does not depend on layout storage. */ } },

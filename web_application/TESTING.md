@@ -1,13 +1,27 @@
 # Application verification
 
 **Document class:** Informative implementation verification record  
-**Status:** EXPERIMENTAL; observed checks, 2026-09-22.
+**Status:** EXPERIMENTAL; implementation checks, 2026-09-22; preview verification, 2026-09-27.
 
 ## Observed results
 
 The following checks passed against the local implementation. They establish the tested behavior in this environment, not a comprehensive security audit, accessibility conformance, standards conformance, or observed institutional practice.
 
-### Graph protocol release, schema 0.2
+### Event-defined spacetime extension
+
+The completed checks total **185 passing tests across separate runs**: 178 non-browser tests and seven Edge browser tests. The reusable protocol package is version 0.3.0; protocol, record-schema and profile identifiers remain at 0.2. The [implementation review](../../../docs/reviews/spacetime_projection_2026-09-22.md) records the scope and limits.
+
+The non-browser run includes 100 protocol cases, existing real-Git storage and API regressions, and six new temporal API cases. It checks retrospective ordering, ancestor-closed cuts, incomparable events, retained cycles and withdrawal, inclusive/exclusive boundaries, unknown and unscoped presence, subject grouping, partial Relation topology, unsupported interpreter behavior, historical projections and authorized read-only cuts. A 1,000-record case checks iterative traversal within the profile's limit.
+
+Three temporal browser journeys cover event-order and extent forms, cut controls, desktop/mobile topology, historical read-only views, conflicting claims, exact cut retry, preserving concurrent unseen relation qualifications, and retaining a selected zero-byte file when discard is declined. The existing registration, graph and retained-file journeys also pass. One existing graph test exceeded its five-second assertion during concurrent browser/Git activity; the fixture now allows 20 seconds, and that journey passed in an isolated rerun. Tests keep their behavioral assertions.
+
+A seventh browser test covers a connected pair beside an isolated topology node. Final visual review found force-layout overlap; edgeless views now use a grid, with collision fallback for connected views. The new test and affected temporal journey passed together on 2026-09-27, checking node separation, retained edges and desktop/mobile layout.
+
+All three JavaScript files pass syntax checks, and the editable package installation passes `pip check`. Screenshots include `build/webapp-review/spacetime-desktop.png`, `spacetime-mobile.png`, and the native file-picker views. These are isolated authored scenarios; assistive-technology and participant-comprehension studies remain open.
+
+On 2026-09-27 the refreshed preview at port 8000 advertised `gsp.spacetime/1` and served the temporal script. Both existing project heads matched their earlier private capture; preview startup did not migrate or seed user projects.
+
+### Graph protocol release, schema 0.2 (historical baseline)
 
 The combined non-browser run passed **125 tests**, with three opt-in browser journeys skipped in that command. The checks exercise the shared package together with the real storage/API implementation:
 

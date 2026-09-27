@@ -9,7 +9,9 @@
     <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
     <!-- Cytoscape recognizes this ID and uses the external container rule instead of injecting an inline stylesheet. -->
     <link id="__________cytoscape_stylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='spacetime.css') }}">
     <script src="{{ url_for('static', filename='vendor/cytoscape.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='spacetime.js') }}" defer></script>
     <script src="{{ url_for('static', filename='graph.js') }}" defer></script>
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
   </head>

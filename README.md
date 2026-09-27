@@ -15,6 +15,7 @@ It is one application within the Generativity Standards Program. The programme's
 - Create records with overlapping Entity, State, Event, Process, Relation and Property roles, attributed context, knowledge basis, uncertainty and alternatives.
 - Create first-class Relations with named participants and qualified direction/reference scope; connect to an existing record or create a record and its relation in one save.
 - Explore, select, filter and arrange the graph or browse a record list. Layout choices affect the display without creating record revisions.
+- Explore event-defined spacetime: record precedence claims, select consistent temporal cuts, and inspect scoped ontology topology and subject trajectories independently of Git recording order.
 - Attach notes and retained files through record modules, replace material, or detach its current association with an attributed reason.
 - Revise records with a reason and change category; inspect historical labels, relations, modules and file bytes at one selected revision.
 - Export JSON metadata, a material-bearing snapshot ZIP, or a Git bundle of reachable project history.
@@ -95,7 +96,7 @@ After development setup, from this application directory on PowerShell:
 & ../.runtime/environments/generalized/Scripts/python.exe -m pytest -c web_application/pytest.ini web_application/tests ../common/packages/gsp_record_protocol/tests ../common/packages/gsp_git_store/tests --basetemp ../.runtime/test-output/generalized -q
 ~~~
 
-Use bin/python on POSIX. The temporary-output directory is disposable and must not contain valuable records. Set GSP_BROWSER to msedge for the three browser journeys if Edge is installed. See [TESTING.md](web_application/TESTING.md) for browser alternatives and [shared verification](../common/conformance/README.md) for scope.
+Use bin/python on POSIX. The temporary-output directory is disposable and must not contain valuable records. Set GSP_BROWSER to msedge for the browser journeys if Edge is installed. See [TESTING.md](web_application/TESTING.md) for browser alternatives and [shared verification](../common/conformance/README.md) for scope.
 
 The migration's combined generalized/common run passed **128 tests**, including three browser journeys. Its [verification report](../common/design/migration_verification.md) records the tested revision and preservation boundary.
 

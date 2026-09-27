@@ -12,12 +12,13 @@ import zipfile
 from flask import jsonify, request, send_file
 from gsp_protocol import (
     PROTOCOL_VERSION, SCHEMA_VERSION, capabilities, normalize_snapshot,
-    prepare_transaction, project_graph, request_digest, validate_transaction, validate_snapshot,
+    prepare_transaction, project_graph, project_spacetime, request_digest, validate_transaction, validate_snapshot,
 )
 
 from gsp_git_store import Conflict, NotFound
 
 JSON_LIMIT = 1024 * 1024
+SPACETIME_QUERY_LIMIT = 64 * 1024
 FILE_LIMIT = 10 * 1024 * 1024
 REQUEST_FILE_LIMIT = 20 * 1024 * 1024
 
@@ -123,6 +124,7 @@ def register_protocol_routes(app, store, authenticated, authorize, actor, utcnow
     def get_protocol():
         result = capabilities()
         result["http_binding"] = {"file_bytes": FILE_LIMIT, "request_file_bytes": REQUEST_FILE_LIMIT,
+                                  "spacetime_query_bytes": SPACETIME_QUERY_LIMIT,
                                   "transaction_json_bytes": JSON_LIMIT, "file_parts": 8,
                                   "snapshot_json_bytes": 32 * 1024 * 1024,
                                   "resource_json_bytes": 2 * 1024 * 1024,
@@ -169,6 +171,31 @@ def register_protocol_routes(app, store, authenticated, authorize, actor, utcnow
         authorize(project_id)
         snapshot = read_snapshot(project_id)
         return jsonify({**project_graph(snapshot), "current_head": snapshot["current_head"], "legacy": snapshot["legacy"]})
+
+    @app.route("/api/projects/<project_id>/spacetime", methods=["GET", "POST"])
+    @authenticated
+    def get_spacetime(project_id):
+        """Select a represented-time cut without changing the retained account."""
+        authorize(project_id)
+        after = None
+        if request.method == "POST":
+            if not request.is_json:
+                raise APIError(415, "content_type", "Send a JSON object with the selected events.")
+            if request.content_length is not None and request.content_length > SPACETIME_QUERY_LIMIT:
+                raise APIError(413, "spacetime_limit", "The event selection exceeds 64 KiB.")
+            raw = request.get_data()
+            if len(raw) > SPACETIME_QUERY_LIMIT:
+                raise APIError(413, "spacetime_limit", "The event selection exceeds 64 KiB.")
+            try:
+                query = strict_json(raw)
+            except (ValueError, UnicodeError, RecursionError):
+                raise APIError(400, "validation", "Use a JSON object with unique fields, finite numbers and valid Unicode.") from None
+            if set(query) != {"after"} or not isinstance(query["after"], list):
+                raise APIError(400, "validation", "Provide only an after list of selected event identifiers.")
+            after = query["after"]
+        snapshot = read_snapshot(project_id)
+        return jsonify({**project_spacetime(snapshot, after=after),
+                        "current_head": snapshot["current_head"], "legacy": snapshot["legacy"]})
 
     @app.get("/api/projects/<project_id>/history")
     @authenticated

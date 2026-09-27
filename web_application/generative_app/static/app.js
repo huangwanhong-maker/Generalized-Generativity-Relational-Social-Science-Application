@@ -268,7 +268,7 @@
   }
   function formSnapshot() {
     const form = dialog.querySelector("form");
-    return form ? JSON.stringify(Array.from(new FormData(form))) : "";
+    return form ? JSON.stringify(Array.from(new FormData(form), ([name, value]) => [name, value instanceof File ? (value.name ? { name: value.name, size: value.size, type: value.type, lastModified: value.lastModified } : null) : value])) : "";
   }
   function canCloseEditor() {
     return !dialog.open || formSnapshot() === editorSnapshot || window.confirm("Discard the unsaved changes in this form?");

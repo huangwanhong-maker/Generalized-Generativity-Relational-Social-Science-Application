@@ -27,6 +27,7 @@ The launcher uses Waitress, binds to loopback by default and resolves source/dat
 - Add records with overlapping recording roles, content, primary knowledge basis, occurrence/modality and owner-assigned status.
 - Record attributed sources, methods, evidence references, uncertainty, alternatives, enabling/constraining conditions and consequences.
 - Explore the graph or record list; select nodes, filter, pan, zoom, arrange and fit the view. Layout is a local display preference and creates no record revision.
+- Open Spacetime to inspect asserted event order, select an event-defined temporal cut and view the corresponding scoped ontology subgraph and trajectories.
 - Create a Relation record with named participant roles, record/target reference scope, direction and completeness qualifications. Add further participants or relate a Relation to another record. Create a new record and its connection in one save.
 - Add retained notes and files through a record's modules. Replace a file or detach its current reference with an attributed reason.
 - Revise a record with a reason and change category; inspect its previous versions and the project's latest 100 revision entries. Historical views pin labels, relationships, modules and file bytes to the same revision.
@@ -36,6 +37,24 @@ The launcher uses Waitress, binds to loopback by default and resolves source/dat
 Retained files are material, not automatically assessed evidence. The application does not fetch evidence URLs. A selected status such as `contested` describes the owner's account; it does not establish an independent review finding. The form records one primary knowledge basis; use method/context fields to preserve qualifications and mixed bases. The graph's placement and arrows establish no additional causal, evidential, ethical or legal meaning.
 
 If another edit advances the project while your form is open, saving returns a conflict and preserves the draft. Review the latest version and reconcile before saving again. This applies across records in the same project. A retry of an unchanged transaction uses its original identifier; the server returns the original receipt if it already succeeded. Editing the request creates a new transaction identity.
+
+## Spacetime and trajectories
+
+Here, space means the topology of the represented ontology at an event-defined boundary. Geographic coordinates can be part of a contextual State or Property account; graph layout positions do not record geographic position.
+
+1. Create Event records, including events learned about retrospectively. Their save order does not determine their represented order.
+2. In **Spacetime**, add an event-order account identifying which Event precedes another and the grounds for that claim. It is retained as a first-class Relation with its own qualifications and history.
+3. Select a record's **Time & trajectory** panel to state the temporal applicability of its account. Boundaries can reference Events, remain explicitly unknown, or be explicitly unbounded within the stated scope. An optional subject groups related State, Property or other accounts into a trajectory; explain the continuity judgment in the basis.
+4. Choose included Events in Spacetime. Selecting a later Event includes its asserted predecessors. The topology displays records established active at that cut, alongside separate coverage and uncertainty information. Changing the cut creates no Git revision.
+5. Use the existing project revision selector to choose which retained account supplies those claims. Historical projections and their record inspectors use that same revision.
+
+The selected Events form a downward-closed set in a partial order. A shared display column does not establish simultaneity, and no relation between two Events means their relative order remains unspecified. Event ranks do not measure elapsed time. The first extension uses Events as operational boundary markers; extended occurrences, onset/completion distinctions and overlapping intervals need further work.
+
+Extent starts are inclusive and ends exclusive. An unknown boundary does not establish presence. Records lacking a scope remain **unscoped**, and an extent with incomparable, identical or reversed Event boundaries remains **indeterminate**. When a scoped Relation has participants not established active at the cut, the view discloses the omitted incidences. Contradictory order cycles remain inspectable and prevent a consistent cut until the account is revised. Unsupported event-order versions also prevent a cut; unsupported extent versions leave the affected account indeterminate. Withdrawal is an attributed revision, not deletion of the earlier claim.
+
+This is a projection of explicit temporal accounts. It does not simulate event effects or treat the latest description as evidence of every earlier target state. Preserve distinct historical State accounts and their bounds when the target changes. Competing and non-realized accounts retain their qualifications; a temporal projection is not factual adjudication.
+
+The read-only API is `GET /api/projects/<id>/spacetime?revision=<40-hex-head>` for the all-event cut, or `POST` to the same URL with `{"after":["event-uuid"]}` to select a cut. POST requires the ordinary session and CSRF token but creates no transaction. `after: []` selects the empty cut. Requests are limited to 1,000 distinct Event identifiers and 64 KiB. Both methods return the selected `head`, `current_head`, event order, cut, scopes, topology and diagnostics.
 
 ## Where records live
 
@@ -85,4 +104,4 @@ Tests use isolated temporary databases and real Git repositories. The browser te
 
 The [current design](../../../docs/planning/graph_workspace_design.md) and [ADR-0008](../../../decisions/ADR-0008-record-graphs-transactions-and-modules.md) connect manuscript interpretation, user interaction and architecture. The [academia review](../../../docs/reviews/academia_application_reference.md) records useful patterns and incompatibilities without copying its implementation. [DESIGN.md](DESIGN.md) retains the earlier design and initial traceability baseline.
 
-The reusable [protocol package](../../common/packages/gsp_record_protocol/README.md), [GR-SPEC-120](../../../specifications/GR-SPEC-120-information-model/GR-SPEC-120.md) and [GR-SPEC-130](../../../specifications/GR-SPEC-130-interchange/GR-SPEC-130.md) define the experimental model and binding. Official implementation references include [Git update-ref](https://git-scm.com/docs/git-update-ref/2.45.0), [Flask security guidance](https://flask.palletsprojects.com/en/stable/web-security/) and [Cytoscape.js](https://js.cytoscape.org/).
+The reusable [protocol package](../../common/packages/gsp_record_protocol/README.md), [GR-SPEC-120](../../../specifications/GR-SPEC-120-information-model/GR-SPEC-120.md), [GR-SPEC-121](../../../specifications/GR-SPEC-121-event-time-projection/GR-SPEC-121.md) and [GR-SPEC-130](../../../specifications/GR-SPEC-130-interchange/GR-SPEC-130.md) define the experimental model and binding. The [event-spacetime design](../../../docs/planning/event_spacetime_design.md) records manuscript grounding and the operational limits. Official implementation references include [Git update-ref](https://git-scm.com/docs/git-update-ref/2.45.0), [Flask security guidance](https://flask.palletsprojects.com/en/stable/web-security/) and [Cytoscape.js](https://js.cytoscape.org/).
