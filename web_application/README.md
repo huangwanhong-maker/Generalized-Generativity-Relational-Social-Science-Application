@@ -38,6 +38,32 @@ Retained files are material, not automatically assessed evidence. The applicatio
 
 If another edit advances the project while your form is open, saving returns a conflict and preserves the draft. Review the latest version and reconcile before saving again. This applies across records in the same project. A retry of an unchanged transaction uses its original identifier; the server returns the original receipt if it already succeeded. Editing the request creates a new transaction identity.
 
+## Demonstration and screenshots
+
+The **River Commons** demo contains 31 synthetic records across all six roles, five Events, six source files and seven preserved project revisions. Follow an inquiry from retrospective event recording through two topology cuts, subject trajectories, competing accounts and a correction of the retained history.
+
+![The synthetic River Commons graph and Relation inspector](../docs/gallery/01-record-graph.png)
+
+![River Commons event order in the Spacetime view](../docs/gallery/02-event-order.png)
+
+### See the ontology change across event boundaries
+
+**After the access agreement:** the encounter and agreement are included, with 10 scoped records in the topology. The inspector shows **A garden open for a trial**.
+
+![Spacetime topology at the agreement boundary with trial access](../docs/gallery/03-earlier-topology.png)
+
+**After the review:** its declared predecessors are included, with 13 scoped records. The inspector shows **Access under a revised rota**. Both views use the same Git revision.
+
+![Spacetime topology at the review boundary with revised access](../docs/gallery/04-later-topology.png)
+
+**Subject trajectories** retain successive descriptions and their event bounds, including accounts that ended or remain indeterminate:
+
+![Subject trajectories for the garden and stewardship team](../docs/gallery/05-subject-trajectories.png)
+
+To reproduce this in the demo, open **Spacetime**, choose **Before all**, then mark **A provisional access agreement** as passed. Inspect the topology and trajectories; next mark **A shared review** as passed and compare. This changes the chosen partial-order cut without saving a revision. The independent water observation remains unordered, and incomparable events are not asserted simultaneous.
+
+See the [ten-image gallery](../docs/gallery/README.md) and [demo setup and walkthrough](demo/README.md). The scripts create a separate test account through the ordinary API and capture the actual UI. Credentials remain in ignored `.runtime/demo/river-commons.json`. The pictured graph uses the visible **care** filter and a local display arrangement; neither changes retained records.
+
 ## Spacetime and trajectories
 
 Here, space means the topology of the represented ontology at an event-defined boundary. Geographic coordinates can be part of a contextual State or Property account; graph layout positions do not record geographic position.

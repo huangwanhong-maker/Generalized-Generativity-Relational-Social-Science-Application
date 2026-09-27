@@ -23,6 +23,36 @@ It is one application within the Generativity Standards Program. The programme's
 
 The [web application guide](web_application/README.md) gives the detailed interaction model, resource limits and account behavior. A Relation can itself have properties, notes, files and history. The graph's position and arrows add no causal, epistemic or legal meaning beyond the records they present.
 
+## Demo gallery
+
+Explore **River Commons**, a fictional inquiry into shared care of a garden. Its 31 records cover all six operational roles, five Events, notes, six retained files and seven Git revisions. The scenario includes retrospective recording, branching event precedence, changing State accounts, contested interpretations, an unrealized alternative and a correction whose earlier account remains accessible.
+
+![River Commons record graph and the selected stewardship Relation](docs/gallery/01-record-graph.png)
+
+![Event-defined spacetime with precedence independent of Git recording order](docs/gallery/02-event-order.png)
+
+### Visualized spacetime
+
+Choose an event boundary to see the ontology topology applicable there. The two views below use the same retained revision: the first includes the encounter and agreement; the second also includes the workday and review.
+
+**After the agreement: 10 projected records.** Trial access and a provisional stewardship arrangement apply.
+
+![Agreement frontier, scoped ontology graph and trial-access State](docs/gallery/03-earlier-topology.png)
+
+**After the review: 13 projected records.** Trial accounts end; revised access, renewed stewardship and the workload concern apply.
+
+![Review frontier, changed ontology graph and revised-access State](docs/gallery/04-later-topology.png)
+
+The trajectory view connects descriptions under their recorded subjects. For the garden, follow **Access not yet arranged → A garden open for a trial → Access under a revised rota**, with their inclusive start and exclusive end boundaries:
+
+![Subject trajectories with event bounds and applicability](docs/gallery/05-subject-trajectories.png)
+
+The independent water observation remains unordered. These are selected partial-order cuts, not equally spaced instants or assertions that incomparable events occurred simultaneously. Moving between cuts changes the projection without creating a Git revision.
+
+The [full gallery](docs/gallery/README.md) contains ten actual interface screenshots, including two temporal cuts at the same revision, subject trajectories, temporal editing, file attachment, historical contradiction and mobile use. The graph overview shows the visible **care** filter (11 of 31 records) and locally arranged node positions.
+
+The [demo guide](web_application/demo/README.md) provides the narrative walkthrough and commands to create a separate synthetic account and project, then reproduce the images. Demo credentials stay in the ignored infrastructure runtime. The example illustrates implemented behavior; its invented accounts and files do not establish facts about a real community.
+
 ## Source repository and dependencies
 
 ~~~text

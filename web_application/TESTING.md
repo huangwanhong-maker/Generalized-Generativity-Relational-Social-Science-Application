@@ -7,6 +7,14 @@
 
 The following checks passed against the local implementation. They establish the tested behavior in this environment, not a comprehensive security audit, accessibility conformance, standards conformance, or observed institutional practice.
 
+### River Commons demonstration and gallery (2026-09-27)
+
+The [synthetic demo](demo/README.md) was created through the authenticated local API in a separate account. Its verified inventory contains 31 records, all six roles, five Events, five order accounts (one withdrawn), six retained files and seven project revisions. All six downloaded materials matched their authored source bytes. The initial revision contains the later review before the earlier encounter is recorded; a historical cycle remains readable, while the current account supports consistent cuts. The agreement and review cuts project 10 and 13 records respectively without changing the accepted Git head.
+
+The [capture script](demo/capture.py) produced ten actual Edge screenshots at desktop and mobile sizes. Visual review covered the graph, both topology cuts, trajectories, temporal editor, files, native upload control and historical contradiction. Capture discarded the unsaved editor/upload drafts and verified that the project head stayed unchanged. No page errors, captured CSP errors or horizontal mobile overflow were reported. The refreshed topology captures retain the selected event frontier and compare trial access with revised access; capture assertions check the 10-record and 13-record projections. Image hashes and the ten parent preview copies matched; 139 local links across the six related READMEs resolved. The [gallery manifest](../docs/gallery/manifest.json) records the capture inputs and image hashes without credentials.
+
+An additional isolated server check began with the server unavailable, then recovered the saved unconfirmed registration. It produced exactly one account and one project. Repeating the seeder preserved that account, project, accepted head and complete seven-revision history. The check did not use the live demo runtime. These are focused demo and reproduction checks; the implementation suite results below were not rerun as part of adding the gallery.
+
 ### Event-defined spacetime extension
 
 The completed checks total **185 passing tests across separate runs**: 178 non-browser tests and seven Edge browser tests. The reusable protocol package is version 0.3.0; protocol, record-schema and profile identifiers remain at 0.2. The [implementation review](../../../docs/reviews/spacetime_projection_2026-09-22.md) records the scope and limits.

@@ -1,0 +1,107 @@
+{
+  "scenario": "river-commons/1",
+  "synthetic": true,
+  "captured_at": "2026-09-27T04:14:12.521866+00:00",
+  "application_source_commit": "25209f577596c3001e9a328be03af7ddcca24129",
+  "project_head": "d2161a433a78cd24a56a2f48244c6966e4f08966",
+  "verification": {
+    "record_count": 31,
+    "roles": [
+      "Entity",
+      "Event",
+      "Process",
+      "Property",
+      "Relation",
+      "State"
+    ],
+    "event_count": 5,
+    "order_count": 5,
+    "file_count": 6,
+    "revision_count": 7,
+    "downloaded_materials_match": true,
+    "earlier_topology_count": 10,
+    "later_topology_count": 13,
+    "historical_cycle_preserved": true,
+    "retrospective_insertion_verified": true,
+    "cut_reads_preserve_head": true
+  },
+  "browser_channel": "msedge",
+  "desktop_viewport": {
+    "width": 1680,
+    "height": 1120
+  },
+  "mobile_viewport": {
+    "width": 430,
+    "height": 1050
+  },
+  "record_mutations_during_capture": 0,
+  "images": [
+    {
+      "file": "01-record-graph.png",
+      "caption": "The retained record graph and a first-class Relation with named participants; any active search filter is shown in the interface.",
+      "sha256": "3a78d290710e972ed4e3b4fa358f1e302b088de0458f16aa441204b8bcf0bba7",
+      "bytes": 206345
+    },
+    {
+      "file": "02-event-order.png",
+      "caption": "Explicit event precedence contains a branch and an unordered observation. An earlier occurrence was recorded after the review event.",
+      "sha256": "ad555cf5672a7e90149e2c79c957ecf91d1875359aa236018f37bb3426e3e98a",
+      "bytes": 146120
+    },
+    {
+      "file": "03-earlier-topology.png",
+      "caption": "Ontology topology after the access-agreement event, under the current retained account. Coverage remains inspectable.",
+      "sha256": "a53c55e2dfa386b4449f60970d521e79887154674a8d4cbd431b81b0014dedc0",
+      "bytes": 148260
+    },
+    {
+      "file": "04-later-topology.png",
+      "caption": "A later event cut at the same Git revision changes scoped topology and State applicability; choosing a cut creates no revision.",
+      "sha256": "b62901cc79f5cd7ad206a1a2e55fe788525b6fda46487de066a197cea200ad4c",
+      "bytes": 155644
+    },
+    {
+      "file": "05-subject-trajectories.png",
+      "caption": "Successive and competing descriptions are grouped by their explicitly recorded subject, with their event bounds and presence classifications.",
+      "sha256": "22d2fa1da49580452c79e60278bd7c61b16ba61a538f8b69892243c7d589900a",
+      "bytes": 129495
+    },
+    {
+      "file": "06-temporal-editor.png",
+      "caption": "The actual temporal-extent editor preserves inclusive start, exclusive end, subject grouping and the stated basis.",
+      "sha256": "0382e70b09720ab838e0558b33b1a291becf62aef7cb666f66d6aa5340144853",
+      "bytes": 67433
+    },
+    {
+      "file": "07-retained-files.png",
+      "caption": "Fictional source material is retained beside an account, with download access and custody metadata.",
+      "sha256": "1caab898a8ef60f4789e1bea96ab8e13e9a7c5ed6c3c5762522a7be1eff61a6d",
+      "bytes": 187173
+    },
+    {
+      "file": "08-file-upload.png",
+      "caption": "The native styled upload chooser with a synthetic file selected. This screenshot-only draft is discarded, not saved.",
+      "sha256": "eb183f7ea6102e7052cabb7565868c0469f27646e52643442fb9b45f94421036",
+      "bytes": 36869
+    },
+    {
+      "file": "09-preserved-conflict.png",
+      "caption": "A pinned historical account preserves conflicting event orders. The current account withdraws the contradictory claim without erasing this revision.",
+      "sha256": "706913929a7f8421e4875c5744cf77e2e49b44e5c2fccef040f076dba3b82dc5",
+      "bytes": 129250
+    },
+    {
+      "file": "10-mobile-workspace.png",
+      "caption": "The same project on a narrow viewport, with the event-order view and ordinary workspace controls.",
+      "sha256": "651f0d591027f28b6bc29020490f16bf198d56bcf508d89c3d4044fb6cee8523",
+      "bytes": 62520
+    }
+  ],
+  "parent_preview_copies": {
+    "01-record-graph.png": "generalized-record-graph.png",
+    "02-event-order.png": "generalized-spacetime.png",
+    "03-earlier-topology.png": "generalized-spacetime-earlier.png",
+    "04-later-topology.png": "generalized-spacetime-later.png",
+    "05-subject-trajectories.png": "generalized-spacetime-trajectories.png"
+  }
+}

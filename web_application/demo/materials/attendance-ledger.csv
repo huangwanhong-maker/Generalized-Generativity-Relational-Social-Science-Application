@@ -1,0 +1,19 @@
+synthetic_material,entry,fictional_attendee_label,reconciliation
+true,1,A01,distinct
+true,2,A02,distinct
+true,3,A03,distinct
+true,4,A04,distinct
+true,5,A05,distinct
+true,6,A06,distinct
+true,7,A07,distinct
+true,8,A08,distinct
+true,9,A09,distinct
+true,10,A10,distinct
+true,11,A11,distinct
+true,12,A12,distinct
+true,13,A13,distinct
+true,14,A14,distinct
+true,15,A15,distinct
+true,16,A16,distinct
+true,17,A04,duplicate of entry 4
+true,18,A11,duplicate of entry 11
